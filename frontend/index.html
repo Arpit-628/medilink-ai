@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediLink AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F6FAF8;
+    --surface:#FFFFFF;
+    --primary:#146356;
+    --primary-light:#DCF2ED;
+    --accent:#FF6B5C;
+    --text:#10241F;
+    --muted:#5B7A72;
+    --border:#E1EDE9;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:48px 20px 80px;
+    min-height:100vh;
+  }
+
+  /* ---------- Hero ---------- */
+  .hero{ text-align:center; max-width:640px; margin-bottom:36px; }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:6px;
+    font-size:12px; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--primary); font-weight:600; margin-bottom:14px;
+  }
+  .eyebrow .dot{
+    width:6px; height:6px; border-radius:50%; background:var(--accent);
+    animation:pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse{ 0%,100%{opacity:1; transform:scale(1);} 50%{opacity:.4; transform:scale(1.4);} }
+
+  h1{
+    font-family:'Fraunces',serif; font-weight:600; font-size:44px;
+    margin:0 0 12px; line-height:1.1; letter-spacing:-0.01em;
+  }
+  .sub{ color:var(--muted); font-size:16px; line-height:1.5; margin:0; }
+
+  /* ---------- Search ---------- */
+  .search-wrap{ width:100%; max-width:640px; position:relative; }
+  .search-box{
+    display:flex; align-items:center; gap:10px;
+    background:var(--surface); border:2px solid var(--border);
+    border-radius:999px; padding:8px 8px 8px 22px;
+    box-shadow:0 8px 24px rgba(20,99,86,0.06);
+    transition:border-color .2s, box-shadow .2s;
+  }
+  .search-box:focus-within{
+    border-color:var(--primary);
+    box-shadow:0 8px 28px rgba(20,99,86,0.14);
+  }
+  .search-box svg{ flex-shrink:0; color:var(--muted); }
+  #searchInput{
+    flex:1; border:none; outline:none; background:transparent;
+    font-family:'Inter',sans-serif; font-size:16px; color:var(--text); padding:10px 0;
+  }
+  #searchInput::placeholder{ color:#9AB3AC; }
+  .emg-toggle{
+    display:flex; align-items:center; gap:8px;
+    font-size:13px; font-weight:600; color:var(--muted);
+    padding:8px 16px; border-radius:999px; cursor:pointer; user-select:none;
+    transition:background .15s, color .15s;
+    white-space:nowrap;
+  }
+  .emg-toggle.active{ background:var(--accent); color:white; }
+
+  .chips{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:16px; }
+  .chip{
+    font-size:13px; padding:7px 14px; border-radius:999px;
+    background:var(--primary-light); color:var(--primary); font-weight:600;
+    cursor:pointer; border:none; transition:background .15s, transform .1s;
+  }
+  .chip:hover{ background:#c6e9e1; transform:translateY(-1px); }
+
+  /* ---------- Results ---------- */
+  .results{ width:100%; max-width:640px; margin-top:36px; }
+  .section{
+    background:var(--surface); border:1px solid var(--border); border-radius:20px;
+    padding:24px 26px; margin-bottom:18px;
+    animation:fadeUp .35s ease both;
+  }
+  @keyframes fadeUp{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+
+  .section-label{
+    font-size:12px; letter-spacing:0.1em; text-transform:uppercase;
+    color:var(--muted); font-weight:700; margin-bottom:14px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .section-label .n{
+    width:20px; height:20px; border-radius:50%; background:var(--primary);
+    color:white; font-size:11px; display:flex; align-items:center; justify-content:center;
+    font-family:'Inter',sans-serif;
+  }
+
+  .med-chip-row{ display:flex; flex-wrap:wrap; gap:8px; }
+  .med-pick{
+    padding:9px 16px; border-radius:12px; border:1.5px solid var(--border);
+    background:var(--bg); font-weight:600; font-size:14px; cursor:pointer;
+    transition:border-color .15s, background .15s;
+  }
+  .med-pick:hover, .med-pick.selected{ border-color:var(--primary); background:var(--primary-light); }
+
+  .pharmacy-card{
+    border:1.5px solid var(--border); border-radius:14px; padding:16px 18px; margin-bottom:10px;
+    display:flex; justify-content:space-between; align-items:center; gap:12px;
+  }
+  .pharmacy-card.best{ border-color:var(--accent); background:#FFF6F4; }
+  .pharmacy-info .name{ font-weight:700; font-size:15px; margin-bottom:4px; }
+  .pharmacy-info .meta{ font-size:13px; color:var(--muted); }
+  .best-badge{
+    font-size:11px; font-weight:700; color:white; background:var(--accent);
+    padding:3px 9px; border-radius:999px; margin-left:8px; letter-spacing:0.03em;
+  }
+  .score-bars{ display:flex; flex-direction:column; gap:5px; min-width:110px; }
+  .score-track{ height:5px; background:var(--border); border-radius:99px; overflow:hidden; }
+  .score-fill{ height:100%; background:var(--primary); border-radius:99px; }
+  .score-num{ font-family:'Fraunces',serif; font-weight:700; font-size:20px; color:var(--primary); text-align:right; }
+
+  .alt-row{ display:flex; gap:8px; flex-wrap:wrap; }
+  .alt-pill{
+    background:var(--primary-light); color:var(--primary); font-weight:600;
+    font-size:13px; padding:8px 14px; border-radius:999px;
+  }
+
+  .disclaimer{
+    font-size:12px; color:var(--muted); margin-top:12px; padding-top:12px;
+    border-top:1px dashed var(--border); line-height:1.5;
+  }
+
+  .empty-hint{ text-align:center; color:var(--muted); font-size:14px; margin-top:8px; }
+  .loading{ text-align:center; color:var(--muted); font-size:14px; padding:20px 0; }
+
+  @media (max-width:480px){
+    h1{ font-size:32px; }
+    .search-box{ flex-wrap:wrap; padding:14px; border-radius:24px; }
+    .emg-toggle{ width:100%; justify-content:center; }
+  }
+</style>
+</head>
+<body>
+<h1>💊 MediLink AI</h1>
+<div class="hero">
+  <div class="eyebrow"><span class="dot"></span> AI-powered pharmacy finder</div>
+  <h1>Find the right medicine,<br>right now.</h1>
+  <p class="sub">Type a medicine name or describe your symptoms — MediLink AI finds it, ranks nearby pharmacies, and suggests alternatives if it's out of stock.</p>
+</div>
+
+<div class="search-wrap">
+  <div class="search-box">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+    <input id="searchInput" placeholder="e.g. Dolo 650  or  I have fever and headache" autocomplete="off">
+    <div class="emg-toggle" id="emgToggle" onclick="toggleEmergency()">🚨 Emergency</div>
+  </div>
+  <div class="chips">
+    <button class="chip" onclick="quickSearch('Dolo 650')">Dolo 650</button>
+    <button class="chip" onclick="quickSearch('I have fever and headache')">Fever + Headache</button>
+    <button class="chip" onclick="quickSearch('acidity')">Acidity</button>
+    <button class="chip" onclick="quickSearch('cold and allergy')">Cold & Allergy</button>
+  </div>
+</div>
+
+<div class="results" id="results"></div>
+
+<script>
+const API = "http://127.0.0.1:8000";
+let emergencyMode = false;
+let debounceTimer = null;
+
+function toggleEmergency(){
+  emergencyMode = !emergencyMode;
+  document.getElementById('emgToggle').classList.toggle('active', emergencyMode);
+  const q = document.getElementById('searchInput').value.trim();
+  if (q) runFlow(q);
+}
+
+function quickSearch(text){
+  document.getElementById('searchInput').value = text;
+  runFlow(text);
+}
+
+document.getElementById('searchInput').addEventListener('input', (e) => {
+  clearTimeout(debounceTimer);
+  const val = e.target.value.trim();
+  const results = document.getElementById('results');
+  if (!val){ results.innerHTML = ''; return; }
+  debounceTimer = setTimeout(() => runFlow(val), 450);
+});
+
+async function runFlow(query){
+  const results = document.getElementById('results');
+  results.innerHTML = `<div class="loading">Searching for "${escapeHtml(query)}"…</div>`;
+
+  const searchRes = await fetch(`${API}/search?query=${encodeURIComponent(query)}`);
+  const searchData = await searchRes.json();
+
+  if (!searchData.results || !searchData.results.length){
+    results.innerHTML = `<div class="empty-hint">No matches yet — try a medicine name or a symptom like "fever" or "acidity".</div>`;
+    return;
+  }
+
+  let html = '';
+
+  html += `<div class="section">
+    <div class="section-label"><span class="n">1</span> ${searchData.mode === 'symptom_match' ? 'Suggested medicines' : 'Matches'}</div>
+    <div class="med-chip-row">
+      ${searchData.results.map((m,i) => `<button class="med-pick ${i===0?'selected':''}" onclick="selectMedicine('${escapeHtml(m)}', this)">${m}</button>`).join('')}
+    </div>
+    ${searchData.disclaimer ? `<div class="disclaimer">${searchData.disclaimer}</div>` : ''}
+  </div>
+  <div id="pharmacySection"></div>
+  <div id="altSection"></div>`;
+
+  results.innerHTML = html;
+
+  await loadMedicineDetails(searchData.results[0]);
+}
+
+function selectMedicine(name, btnEl){
+  document.querySelectorAll('.med-pick').forEach(b => b.classList.remove('selected'));
+  btnEl.classList.add('selected');
+  loadMedicineDetails(name);
+}
+
+async function loadMedicineDetails(medName){
+  const pharmacySection = document.getElementById('pharmacySection');
+  const altSection = document.getElementById('altSection');
+  pharmacySection.innerHTML = `<div class="loading">Ranking nearby pharmacies…</div>`;
+  altSection.innerHTML = '';
+
+  if (emergencyMode){
+    const res = await fetch(`${API}/emergency?medicine_name=${encodeURIComponent(medName)}`);
+    const data = await res.json();
+    const list = data.open_now_within_radius || [];
+    pharmacySection.innerHTML = `<div class="section">
+      <div class="section-label"><span class="n">2</span> Open now, within 3 km</div>
+      ${list.length ? list.map(r => `
+        <div class="pharmacy-card">
+          <div class="pharmacy-info">
+            <div class="name">${r.pharmacy}</div>
+            <div class="meta">${r.distance_km} km · stock ${r.stock} · ₹${r.price}</div>
+          </div>
+        </div>`).join('') : `<div class="empty-hint">No open pharmacies with stock nearby.</div>`}
+    </div>`;
+    return;
+  }
+
+  const [recRes, altRes] = await Promise.all([
+    fetch(`${API}/recommend?medicine_name=${encodeURIComponent(medName)}`),
+    fetch(`${API}/alternatives?medicine_name=${encodeURIComponent(medName)}`)
+  ]);
+  const rec = await recRes.json();
+  const alt = await altRes.json();
+
+  if (rec.error || !rec.results || !rec.results.length){
+    pharmacySection.innerHTML = `<div class="section">
+      <div class="section-label"><span class="n">2</span> Pharmacy recommendation</div>
+      <div class="empty-hint">Out of stock everywhere nearby right now.</div>
+    </div>`;
+  } else {
+    pharmacySection.innerHTML = `<div class="section">
+      <div class="section-label"><span class="n">2</span> Ranked by AI (distance · price · stock · rating)</div>
+      ${rec.results.map(r => {
+        const isBest = rec.best_choice && r.pharmacy === rec.best_choice.pharmacy;
+        return `<div class="pharmacy-card ${isBest ? 'best' : ''}">
+          <div class="pharmacy-info">
+            <div class="name">${r.pharmacy} ${isBest ? '<span class="best-badge">BEST CHOICE</span>' : ''}</div>
+            <div class="meta">₹${r.price} · ${r.distance_km} km · stock ${r.stock} · ★${r.rating}</div>
+          </div>
+          <div class="score-bars">
+            <div class="score-num">${(r.score*100).toFixed(0)}</div>
+            <div class="score-track"><div class="score-fill" style="width:${(r.score*100).toFixed(0)}%"></div></div>
+          </div>
+        </div>`;
+      }).join('')}
+      ${rec.best_choice ? `<div class="disclaimer">${rec.best_choice.reason}</div>` : ''}
+    </div>`;
+  }
+
+  if (alt.alternatives && alt.alternatives.length){
+    altSection.innerHTML = `<div class="section">
+      <div class="section-label"><span class="n">3</span> Alternatives (same active ingredient)</div>
+      <div class="alt-row">
+        ${alt.alternatives.map(a => `<div class="alt-pill">${a.name} · ${a.dosage}</div>`).join('')}
+      </div>
+      <div class="disclaimer">${alt.note}</div>
+    </div>`;
+  }
+}
+
+function escapeHtml(str){
+  return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+</script>
+</body>
+</html>
+
+
